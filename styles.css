@@ -1,0 +1,33 @@
+.root {
+    -fx-background-color: #1D3649;
+}
+
+.root .window-buttons {
+    -fx-background-color: #00b4a0;
+}
+
+.root .window-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+}
+
+.root .window-button:hover {
+    -fx-background-color: #666666;
+}
+
+.root .title-bar {
+    -fx-background-color: #152935;
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-padding: 10px 20px;
+    -fx-alignment: center;
+    -fx-border-color: black;
+    -fx-border-width: 0 0 1 0;
+}
+
+.root .title-bar .decoration-pane {
+    -fx-background-color: transparent;
+}
+
+
