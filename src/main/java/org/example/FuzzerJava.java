@@ -8,6 +8,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.scene.image.Image;
 
 public class FuzzerJava extends Application {
 
@@ -17,9 +18,9 @@ public class FuzzerJava extends Application {
         root.setSpacing(10);
 
         // Информация
-        Label appInfoLabel = new Label("Fuzzer - это инструмент веб-фаззинга с открытым исходным кодом, разработанный на языке Java.");
+        Label appInfoLabel = new Label("Fuzzer - это инструмент для тестирования, позволяющий найти уязвимости в веб-приложениях");
         appInfoLabel.setWrapText(true);
-        appInfoLabel.getStyleClass().add("label");
+        appInfoLabel.getStyleClass().add("label-background");
 
         // Контейнер для поля ввода и кнопки
         HBox inputBox = new HBox();
@@ -32,7 +33,7 @@ public class FuzzerJava extends Application {
         urlTextField.getStyleClass().add("text-field");
 
         Button checkAvailabilityButton = new Button("Проверить доступность");
-        checkAvailabilityButton.setMinWidth(150);
+        checkAvailabilityButton.setMinWidth(160);
 
         // Устанавливаем обработчик событий для кнопки
         checkAvailabilityButton.setOnAction(event -> {
@@ -47,9 +48,17 @@ public class FuzzerJava extends Application {
 
         root.getChildren().addAll(inputBox);
 
-        Scene scene = new Scene(root, 750, 600);
+        Scene scene = new Scene(root, 650, 600);
+        scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
+
+        appInfoLabel.getStyleClass().add("label");
+        inputBox.getStyleClass().add("input-box");
+        urlTextField.getStyleClass().add("text-field");
+        checkAvailabilityButton.getStyleClass().add("button");
 
         primaryStage.setTitle("FuzzerJava");
+
+        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/icon.jpg")));
 
         primaryStage.setScene(scene);
 

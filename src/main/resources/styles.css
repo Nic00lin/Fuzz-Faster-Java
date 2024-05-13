@@ -1,50 +1,33 @@
 .root {
-    -fx-background-color: #1D3649;
-}
-
-.root .window-buttons {
-    -fx-background-color: #00b4a0;
-}
-
-.root .window-button {
-    -fx-background-color: transparent;
-    -fx-text-fill: white;
-}
-
-.root .window-button:hover {
-    -fx-background-color: #666666;
-}
-
-.root .title-bar {
-    -fx-background-color: #152935;
-    -fx-text-fill: white;
-    -fx-font-size: 18px;
-    -fx-font-weight: bold;
-    -fx-padding: 10px 20px;
-    -fx-alignment: center;
-    -fx-border-color: black;
-    -fx-border-width: 0 0 1 0;
-}
-
-.input-box {
-    -fx-spacing: 10px;
-    -fx-padding: 0 0 0 20px;
+    -fx-background-color: #1d3649;
 }
 
 .label {
-    -fx-font-family: "JetBrains Mono";
-    -fx-font-size: 16px;
+    -fx-font-size: 14px;
+    -fx-text-fill: #333;
+}
+
+.label-background {
+    -fx-background-color: #5aaafa;
     -fx-padding: 10px;
-    -fx-border-color: #1D3649; /* Цвет рамки */
-    -fx-border-width: 2px;
-    -fx-background-color: #00B4A0; /* Цвет фона */
-    -fx-text-fill: black; /* Цвет текста */
+    -fx-text-fill: white;
+}
+
+.input-box {
+    -fx-spacing: 5;
 }
 
 .text-field {
-    -fx-pref-width: 300px; /* Устанавливаем предпочтительную ширину поля */
+    -fx-pref-width: 300px;
 }
 
-.label-bold {
-    -fx-font-weight: bold; /* Делаем текст жирным */
+.button {
+    -fx-font-size: 14px;
+    -fx-pref-width: 150px;
+}
+
+.response-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #333;
+    -fx-padding: 10;
 }
