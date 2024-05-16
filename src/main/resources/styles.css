@@ -1,41 +1,39 @@
 .root {
     -fx-background-color: #1d3649;
-    -fx-alignment: top-center;
 }
 
 .label {
     -fx-font-size: 14px;
     -fx-text-fill: #333;
+    -fx-font-weight: bold; /* Жирный текст */
 }
 
 .label-background {
     -fx-background-color: #5aaafa;
     -fx-padding: 10px;
     -fx-text-fill: white;
-    -fx-alignment: center;
-    -fx-font-weight: bold;
 }
 
 .input-box {
-    -fx-spacing: 10;
-    -fx-alignment: center;
+    -fx-spacing: 5;
 }
 
 .text-field {
     -fx-pref-width: 300px;
-    -fx-pref-height: 30px;
     -fx-padding: 5px;
 }
 
 .button {
     -fx-font-size: 14px;
     -fx-pref-width: 150px;
-    -fx-pref-height: 30px;
-    -fx-padding: 5px;
 }
 
 .response-label {
-    -fx-font-size: 18px;
+    -fx-font-size: 16px;
     -fx-text-fill: #333;
     -fx-padding: 5;
+}
+
+.fuzzing-box {
+    -fx-spacing: 10;
 }
