@@ -6,11 +6,14 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import java.io.IOException;
 
-
 public class Fuzzer {
     public static String sendRequest(String url) {
-        HttpClient client = HttpClientBuilder.create().build();
+        // Проверка на корректность URL
+        if (!isValidUrl(url)) {
+            return "Неверно введен URL";
+        }
 
+        HttpClient client = HttpClientBuilder.create().build();
         HttpGet request = new HttpGet(url);
 
         try {
@@ -21,7 +24,11 @@ public class Fuzzer {
 
         } catch (IOException e) {
             e.printStackTrace();
-            return null;
+            return "Ошибка при выполнении запроса: " + e.getMessage();
         }
+    }
+
+    private static boolean isValidUrl(String url) {
+        return url.startsWith("http://") || url.startsWith("https://");
     }
 }
