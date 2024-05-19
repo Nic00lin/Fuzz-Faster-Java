@@ -125,7 +125,7 @@ public class FuzzerJava extends Application {
             }
         });
 
-        // Полоса с надписью "Обнаружение директорий"
+        // "Обнаружение директорий"
         HBox separatorBox2 = new HBox();
         separatorBox2.setAlignment(Pos.CENTER);
         separatorBox2.setSpacing(10);
