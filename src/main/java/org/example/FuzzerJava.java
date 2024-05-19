@@ -8,15 +8,14 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 public class FuzzerJava extends Application {
@@ -60,19 +59,19 @@ public class FuzzerJava extends Application {
         });
 
         // Полоса с надписью "Методы фаззинга"
-        HBox separatorBox = new HBox();
-        separatorBox.setAlignment(Pos.CENTER);
-        separatorBox.setSpacing(10);
-        separatorBox.setPrefWidth(638);
+        HBox separatorBox1 = new HBox();
+        separatorBox1.setAlignment(Pos.CENTER);
+        separatorBox1.setSpacing(10);
+        separatorBox1.setPrefWidth(638);
 
-        Separator leftSeparator = new Separator();
+        Separator leftSeparator1 = new Separator();
         Label fuzzingMethodsLabel = new Label("Методы фаззинга");
         fuzzingMethodsLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
-        Separator rightSeparator = new Separator();
+        Separator rightSeparator1 = new Separator();
 
-        separatorBox.getChildren().addAll(leftSeparator, fuzzingMethodsLabel, rightSeparator);
-        HBox.setHgrow(leftSeparator, Priority.ALWAYS);
-        HBox.setHgrow(rightSeparator, Priority.ALWAYS);
+        separatorBox1.getChildren().addAll(leftSeparator1, fuzzingMethodsLabel, rightSeparator1);
+        HBox.setHgrow(leftSeparator1, Priority.ALWAYS);
+        HBox.setHgrow(rightSeparator1, Priority.ALWAYS);
 
         // Контейнер для поля ввода и кнопки фаззинга
         VBox fuzzingBox = new VBox();
@@ -126,94 +125,152 @@ public class FuzzerJava extends Application {
             }
         });
 
+        // Полоса с надписью "Обнаружение директорий"
+        HBox separatorBox2 = new HBox();
+        separatorBox2.setAlignment(Pos.CENTER);
+        separatorBox2.setSpacing(10);
+        separatorBox2.setPrefWidth(638);
+
+        Separator leftSeparator2 = new Separator();
+        Label directoryDiscoveryLabel = new Label("Обнаружение директорий");
+        directoryDiscoveryLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
+        Separator rightSeparator2 = new Separator();
+
+        separatorBox2.getChildren().addAll(leftSeparator2, directoryDiscoveryLabel, rightSeparator2);
+        HBox.setHgrow(leftSeparator2, Priority.ALWAYS);
+        HBox.setHgrow(rightSeparator2, Priority.ALWAYS);
+
+        // Контейнер для кнопок брутфорса директорий
+        VBox directoryBruteforceBox = new VBox();
+        directoryBruteforceBox.setSpacing(10);
+        directoryBruteforceBox.setAlignment(Pos.CENTER);
+        directoryBruteforceBox.getStyleClass().add("fuzzing-box");
+
+        // Кнопка для брутфорса директорий с использованием заранее заданного списка
+        Button startPredefinedDirectoryBruteforceButton = new Button("Начать брутфорс директорий (предустановленные)");
+        startPredefinedDirectoryBruteforceButton.setMinWidth(300);
+        startPredefinedDirectoryBruteforceButton.getStyleClass().add("button");
+
+        // Устанавливаем обработчик событий для кнопки брутфорса с предустановленным списком
+        startPredefinedDirectoryBruteforceButton.setOnAction(event -> {
+            String url = urlTextField.getText();
+            if (!HttpFuzzer.isValidUrl(url)) {
+                displayError("Неверно введен URL");
+                return;
+            }
+
+            try {
+                StringBuilder directoryListing = new StringBuilder();
+                directoryListing.append("Найденные директории:\n");
+                String[] directories = DirectoryBruteforcer.bruteforceDirectoriesWithPredefinedList(url);
+                for (String dir : directories) {
+                    directoryListing.append(dir).append("\n");
+                }
+                displayAllResponses(directoryListing.toString());
+            } catch (IOException e) {
+                displayError("Ошибка при выполнении брутфорса директорий: " + e.getMessage());
+            }
+        });
+
+        // Кнопка для брутфорса директорий с использованием загруженного списка
+        Button startCustomDirectoryBruteforceButton = new Button("Начать брутфорс директорий (загруженные)");
+        startCustomDirectoryBruteforceButton.setMinWidth(300);
+        startCustomDirectoryBruteforceButton.getStyleClass().add("button");
+
+        // Устанавливаем обработчик событий для кнопки брутфорса с загруженным списком
+        startCustomDirectoryBruteforceButton.setOnAction(event -> {
+            String url = urlTextField.getText();
+            if (!HttpFuzzer.isValidUrl(url)) {
+                displayError("Неверно введен URL");
+                return;
+            }
+
+            try {
+                StringBuilder directoryListing = new StringBuilder();
+                directoryListing.append("Найденные директории:\n");
+                String[] directories = DirectoryBruteforcer.bruteforceDirectories(url);
+                for (String dir : directories) {
+                    directoryListing.append(dir).append("\n");
+                }
+                displayAllResponses(directoryListing.toString());
+            } catch (IOException e) {
+                displayError("Ошибка при выполнении брутфорса директорий: " + e.getMessage());
+            }
+        });
+
+        // Кнопка для загрузки файла с директориями
+        Button loadDirectoriesButton = new Button("Загрузить список директорий");
+        loadDirectoriesButton.setMinWidth(300);
+        loadDirectoriesButton.getStyleClass().add("button");
+
+        // Устанавливаем обработчик событий для кнопки загрузки списка директорий
+        loadDirectoriesButton.setOnAction(event -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Выберите файл со списком директорий");
+            File file = fileChooser.showOpenDialog(primaryStage);
+            if (file != null) {
+                try {
+                    DirectoryBruteforcer.loadCommonDirectories(file.getAbsolutePath());
+                    displayResponse("Список директорий успешно загружен");
+                } catch (IOException e) {
+                    displayError("Ошибка при загрузке файла: " + e.getMessage());
+                }
+            }
+        });
+
         inputBox.getChildren().addAll(urlTextField, checkAvailabilityButton);
-        fuzzingBox.getChildren().addAll(separatorBox, startFuzzingButton, startHeaderFuzzingButton);
+        fuzzingBox.getChildren().addAll(separatorBox1, startFuzzingButton, startHeaderFuzzingButton);
+        directoryBruteforceBox.getChildren().addAll(separatorBox2, startPredefinedDirectoryBruteforceButton, startCustomDirectoryBruteforceButton);
 
-        root.getChildren().addAll(appInfoLabel, inputBox, fuzzingBox);
+        root.getChildren().addAll(appInfoLabel, inputBox, fuzzingBox, directoryBruteforceBox, loadDirectoriesButton);
 
-        Scene scene = new Scene(root, 638, 600);
-        scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
+        Scene scene = new Scene(root, 800, 600);
+        scene.getStylesheets().add("styles.css");
 
-        primaryStage.setTitle("FuzzerJava");
-        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/icon.jpg")));
+        primaryStage.setTitle("Fuzzer");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
     private void displayResponse(String response) {
         Stage responseStage = new Stage();
-        responseStage.setTitle("HTTP Response");
+        responseStage.setTitle("Ответ");
 
-        HBox root = new HBox();
-        root.setAlignment(Pos.CENTER_LEFT);
-        root.setSpacing(10);
-        root.setStyle("-fx-padding: 10;");
+        VBox responseBox = new VBox();
+        responseBox.setSpacing(10);
+        responseBox.setAlignment(Pos.CENTER);
+        responseBox.getStyleClass().add("response-box");
 
-        ImageView icon = new ImageView(new Image(getClass().getResourceAsStream("/ok-icon.png")));
-        icon.setFitWidth(48);
-        icon.setFitHeight(48);
+        TextArea responseTextArea = new TextArea(response);
+        responseTextArea.setWrapText(true);
+        responseTextArea.setEditable(false);
+        responseTextArea.getStyleClass().add("response-text-area");
 
-        Label responseLabel = new Label(response);
-        responseLabel.setStyle("-fx-font-size: 16px;");
-        responseLabel.setWrapText(true);
+        Button closeButton = new Button("Закрыть");
+        closeButton.setMinWidth(100);
+        closeButton.getStyleClass().add("button");
 
-        root.getChildren().addAll(icon, responseLabel);
+        closeButton.setOnAction(event -> responseStage.close());
 
-        Scene scene = new Scene(root, 400, 200);
-        responseStage.setScene(scene);
+        responseBox.getChildren().addAll(responseTextArea, closeButton);
+
+        Scene responseScene = new Scene(responseBox, 400, 300);
+        responseScene.getStylesheets().add("org/example/style.css");
+
+        responseStage.setScene(responseScene);
         responseStage.show();
     }
 
-    private void displayError(String errorMessage) {
-        Stage errorStage = new Stage();
-        errorStage.setTitle("Ошибка");
-
-        HBox root = new HBox();
-        root.setAlignment(Pos.CENTER_LEFT);
-        root.setSpacing(10);
-        root.setStyle("-fx-padding: 10;");
-
-        ImageView icon = new ImageView(new Image(getClass().getResourceAsStream("/error-icon.png")));
-        icon.setFitWidth(48);
-        icon.setFitHeight(48);
-
-        Label errorLabel = new Label(errorMessage);
-        errorLabel.setStyle("-fx-font-size: 16px;");
-        errorLabel.setWrapText(true);
-
-        root.getChildren().addAll(icon, errorLabel);
-
-        Scene scene = new Scene(root, 400, 200);
-        errorStage.setScene(scene);
-        errorStage.show();
+    private void displayError(String error) {
+        displayResponse("Ошибка: " + error);
     }
 
     private void displayAllResponses(String responses) {
-        Stage responseStage = new Stage();
-        responseStage.setTitle("HTTP Responses");
-
-        VBox root = new VBox();
-        root.setAlignment(Pos.CENTER_LEFT);
-        root.setSpacing(10);
-        root.setStyle("-fx-padding: 10;");
-
-        ImageView icon = new ImageView(new Image(getClass().getResourceAsStream("/ok-icon.png")));
-        icon.setFitWidth(48);
-        icon.setFitHeight(48);
-
-        TextArea responseArea = new TextArea(responses);
-        responseArea.setStyle("-fx-font-size: 16px;");
-        responseArea.setWrapText(true);
-        responseArea.setEditable(false);
-
-        root.getChildren().addAll(icon, responseArea);
-
-        Scene scene = new Scene(root, 400, 400);
-        responseStage.setScene(scene);
-        responseStage.show();
+        displayResponse(responses);
     }
 
     public static void main(String[] args) {
         launch(args);
     }
 }
+
