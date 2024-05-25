@@ -218,13 +218,68 @@ public class FuzzerJava extends Application {
             }
         });
 
+        // Разделитель "Поиск уязвимостей"
+        HBox separatorBox3 = new HBox();
+        separatorBox3.setAlignment(Pos.CENTER);
+        separatorBox3.setSpacing(10);
+        separatorBox3.setPrefWidth(638);
+        Separator leftSeparator3 = new Separator();
+        Separator rightSeparator3 = new Separator();
+        Label vulnerabilitiesLabel = new Label("Поиск уязвимостей");
+        vulnerabilitiesLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: red;");
+
+        separatorBox3.getChildren().addAll(leftSeparator3, vulnerabilitiesLabel, rightSeparator3);
+        HBox.setHgrow(leftSeparator3, Priority.ALWAYS);
+        HBox.setHgrow(rightSeparator3, Priority.ALWAYS);
+
+        // Кнопка для фаззинга SQL инъекций
+        Button startSQLInjectionFuzzingButton = new Button("Начать SQL Injection фаззинг");
+        startSQLInjectionFuzzingButton.setMinWidth(220);
+        startSQLInjectionFuzzingButton.getStyleClass().add("button");
+
+        // Устанавливаем обработчик событий для кнопки фаззинга SQL инъекций
+        startSQLInjectionFuzzingButton.setOnAction(event -> {
+            String url = urlTextField.getText();
+            if (!HttpFuzzer.isValidUrl(url)) {
+                displayError("Неверно введен URL");
+                return;
+            }
+
+            try {
+                String response = SQLInjectionFuzzer.fuzzSQLInjection(url);
+                displayAllResponses("SQL Injection фаззинг: " + response);
+            } catch (IOException e) {
+                displayError("Ошибка при выполнении SQL Injection фаззинга: " + e.getMessage());
+            }
+        });
+        // Кнопка для Directory Traversal фаззинга
+        Button startDirectoryTraversalFuzzingButton = new Button("Начать Directory Traversal фаззинг");
+        startDirectoryTraversalFuzzingButton.setMinWidth(220);
+        startDirectoryTraversalFuzzingButton.getStyleClass().add("button");
+
+// Устанавливаем обработчик событий для кнопки фаззинга Directory Traversal
+        startDirectoryTraversalFuzzingButton.setOnAction(event -> {
+            String url = urlTextField.getText();
+            if (!HttpFuzzer.isValidUrl(url)) {
+                displayError("Неверно введен URL");
+                return;
+            }
+
+            try {
+                String response = DirectoryTraversalFuzzer.fuzzDirectoryTraversal(url).toString();
+                displayAllResponses("Directory Traversal фаззинг: " + response);
+            } catch (IOException e) {
+                displayError("Ошибка при выполнении Directory Traversal фаззинга: " + e.getMessage());
+            }
+        });
+
         inputBox.getChildren().addAll(urlTextField, checkAvailabilityButton);
         fuzzingBox.getChildren().addAll(separatorBox1, startFuzzingButton, startHeaderFuzzingButton);
         directoryBruteforceBox.getChildren().addAll(separatorBox2, startPredefinedDirectoryBruteforceButton, startCustomDirectoryBruteforceButton);
 
-        root.getChildren().addAll(appInfoLabel, inputBox, fuzzingBox, directoryBruteforceBox, loadDirectoriesButton);
+        root.getChildren().addAll(appInfoLabel, inputBox, fuzzingBox, directoryBruteforceBox, loadDirectoriesButton, separatorBox3, startDirectoryTraversalFuzzingButton,  startSQLInjectionFuzzingButton);
 
-        Scene scene = new Scene(root, 800, 600);
+        Scene scene = new Scene(root, 700, 600);
         scene.getStylesheets().add("styles.css");
 
         primaryStage.setTitle("Fuzzer");
@@ -273,4 +328,3 @@ public class FuzzerJava extends Application {
         launch(args);
     }
 }
-
