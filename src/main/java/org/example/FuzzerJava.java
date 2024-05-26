@@ -1,27 +1,34 @@
 package org.example;
 
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class FuzzerJava extends Application {
 
+    private ExecutorService executorService = Executors.newFixedThreadPool(10);
+
     @Override
     public void start(Stage primaryStage) {
+        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/icon.jpg")));
+
         VBox root = new VBox();
         root.setSpacing(10);
         root.setAlignment(Pos.TOP_CENTER);
@@ -58,6 +65,33 @@ public class FuzzerJava extends Application {
             }
         });
 
+        Button scanResourceButton = new Button("Сканировать ресурс");
+        scanResourceButton.setMinWidth(220);
+        scanResourceButton.getStyleClass().add("button");
+
+        scanResourceButton.setOnAction(event -> {
+            String url = urlTextField.getText();
+            if (!HttpFuzzer.isValidUrl(url)) {
+                displayError("Неверно введен URL");
+                return;
+            }
+
+            // Запуск многопоточного сканирования ресурса
+            Task<Void> scanTask = new Task<Void>() {
+                @Override
+                protected Void call() throws Exception {
+                    try {
+                        String result = ResourceScanner.scanResource(url);
+                        Platform.runLater(() -> displayAllResponses(result));
+                    } catch (IOException e) {
+                        Platform.runLater(() -> displayError("Ошибка при сканировании ресурса: " + e.getMessage()));
+                    }
+                    return null;
+                }
+            };
+            executorService.submit(scanTask);
+        });
+
         // Полоса с надписью "Методы фаззинга"
         HBox separatorBox1 = new HBox();
         separatorBox1.setAlignment(Pos.CENTER);
@@ -72,6 +106,7 @@ public class FuzzerJava extends Application {
         separatorBox1.getChildren().addAll(leftSeparator1, fuzzingMethodsLabel, rightSeparator1);
         HBox.setHgrow(leftSeparator1, Priority.ALWAYS);
         HBox.setHgrow(rightSeparator1, Priority.ALWAYS);
+
 
         // Контейнер для поля ввода и кнопки фаззинга
         VBox fuzzingBox = new VBox();
@@ -158,18 +193,8 @@ public class FuzzerJava extends Application {
                 displayError("Неверно введен URL");
                 return;
             }
-
-            try {
-                StringBuilder directoryListing = new StringBuilder();
-                directoryListing.append("Найденные директории:\n");
-                String[] directories = DirectoryBruteforcer.bruteforceDirectoriesWithPredefinedList(url);
-                for (String dir : directories) {
-                    directoryListing.append(dir).append("\n");
-                }
-                displayAllResponses(directoryListing.toString());
-            } catch (IOException e) {
-                displayError("Ошибка при выполнении брутфорса директорий: " + e.getMessage());
-            }
+            // Открыть новое окно и запустить многопоточный брутфорс директорий
+            openDirectoryBruteforceWindow(url, DirectoryBruteforcer.getPredefinedList());
         });
 
         // Кнопка для брутфорса директорий с использованием загруженного списка
@@ -184,18 +209,8 @@ public class FuzzerJava extends Application {
                 displayError("Неверно введен URL");
                 return;
             }
-
-            try {
-                StringBuilder directoryListing = new StringBuilder();
-                directoryListing.append("Найденные директории:\n");
-                String[] directories = DirectoryBruteforcer.bruteforceDirectories(url);
-                for (String dir : directories) {
-                    directoryListing.append(dir).append("\n");
-                }
-                displayAllResponses(directoryListing.toString());
-            } catch (IOException e) {
-                displayError("Ошибка при выполнении брутфорса директорий: " + e.getMessage());
-            }
+            // Открыть новое окно и запустить многопоточный брутфорс директорий
+            openDirectoryBruteforceWindow(url, DirectoryBruteforcer.getCustomList());
         });
 
         // Кнопка для загрузки файла с директориями
@@ -245,19 +260,16 @@ public class FuzzerJava extends Application {
                 return;
             }
 
-            try {
-                String response = SQLInjectionFuzzer.fuzzSQLInjection(url);
-                displayAllResponses("SQL Injection фаззинг: " + response);
-            } catch (IOException e) {
-                displayError("Ошибка при выполнении SQL Injection фаззинга: " + e.getMessage());
-            }
+            String response = SQLInjectionFuzzer.fuzzSQLInjection(url);
+            displayAllResponses("SQL Injection фаззинг: " + response);
         });
+
         // Кнопка для Directory Traversal фаззинга
         Button startDirectoryTraversalFuzzingButton = new Button("Начать Directory Traversal фаззинг");
         startDirectoryTraversalFuzzingButton.setMinWidth(220);
         startDirectoryTraversalFuzzingButton.getStyleClass().add("button");
 
-// Устанавливаем обработчик событий для кнопки фаззинга Directory Traversal
+        // Устанавливаем обработчик событий для кнопки фаззинга Directory Traversal
         startDirectoryTraversalFuzzingButton.setOnAction(event -> {
             String url = urlTextField.getText();
             if (!HttpFuzzer.isValidUrl(url)) {
@@ -277,7 +289,7 @@ public class FuzzerJava extends Application {
         fuzzingBox.getChildren().addAll(separatorBox1, startFuzzingButton, startHeaderFuzzingButton);
         directoryBruteforceBox.getChildren().addAll(separatorBox2, startPredefinedDirectoryBruteforceButton, startCustomDirectoryBruteforceButton);
 
-        root.getChildren().addAll(appInfoLabel, inputBox, fuzzingBox, directoryBruteforceBox, loadDirectoriesButton, separatorBox3, startDirectoryTraversalFuzzingButton,  startSQLInjectionFuzzingButton);
+        root.getChildren().addAll(appInfoLabel, inputBox, fuzzingBox, directoryBruteforceBox, loadDirectoriesButton, separatorBox3, startDirectoryTraversalFuzzingButton, startSQLInjectionFuzzingButton, scanResourceButton);
 
         Scene scene = new Scene(root, 700, 600);
         scene.getStylesheets().add("styles.css");
@@ -310,7 +322,7 @@ public class FuzzerJava extends Application {
         responseBox.getChildren().addAll(responseTextArea, closeButton);
 
         Scene responseScene = new Scene(responseBox, 400, 300);
-        responseScene.getStylesheets().add("org/example/style.css");
+        responseScene.getStylesheets().add("styles.css");
 
         responseStage.setScene(responseScene);
         responseStage.show();
@@ -322,6 +334,65 @@ public class FuzzerJava extends Application {
 
     private void displayAllResponses(String responses) {
         displayResponse(responses);
+    }
+
+    private void openDirectoryBruteforceWindow(String url, List<String> directories) {
+        Stage bruteforceStage = new Stage();
+        bruteforceStage.setTitle("Брутфорс директорий");
+
+        VBox bruteforceBox = new VBox();
+        bruteforceBox.setSpacing(10);
+        bruteforceBox.setAlignment(Pos.CENTER);
+        bruteforceBox.getStyleClass().add("response-box");
+
+        TextArea progressTextArea = new TextArea();
+        progressTextArea.setWrapText(true);
+        progressTextArea.setEditable(false);
+        progressTextArea.getStyleClass().add("response-text-area");
+
+        Button closeButton = new Button("Закрыть");
+        closeButton.setMinWidth(100);
+        closeButton.getStyleClass().add("button");
+
+        closeButton.setOnAction(event -> bruteforceStage.close());
+
+        bruteforceBox.getChildren().addAll(progressTextArea, closeButton);
+
+        Scene bruteforceScene = new Scene(bruteforceBox, 400, 300);
+        bruteforceScene.getStylesheets().add("styles.css");
+
+        bruteforceStage.setScene(bruteforceScene);
+        bruteforceStage.show();
+
+        // Запуск многопоточного брутфорса директорий
+        Task<Void> bruteforceTask = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                try {
+                    StringBuilder directoryListing = new StringBuilder();
+                    directoryListing.append("Найденные директории:\n");
+
+                    for (String dir : directories) {
+                        executorService.submit(() -> {
+                            try {
+                                String result = DirectoryBruteforcer.checkDirectory(url, dir);
+                                if (!result.isEmpty()) {
+                                    directoryListing.append(result).append("\n");
+                                }
+                                Platform.runLater(() -> progressTextArea.setText(directoryListing.toString()));
+                            } catch (IOException e) {
+                                Platform.runLater(() -> displayError("Ошибка при выполнении брутфорса директорий: " + e.getMessage()));
+                            }
+                        });
+                    }
+                } catch (Exception e) {
+                    Platform.runLater(() -> displayError("Ошибка при выполнении брутфорса директорий: " + e.getMessage()));
+                }
+                return null;
+            }
+        };
+
+        executorService.submit(bruteforceTask);
     }
 
     public static void main(String[] args) {
