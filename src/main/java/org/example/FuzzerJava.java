@@ -66,7 +66,7 @@ public class FuzzerJava extends Application {
         });
 
         Button scanResourceButton = new Button("Сканировать ресурс");
-        scanResourceButton.setMinWidth(220);
+        scanResourceButton.setMinWidth(280);
         scanResourceButton.getStyleClass().add("button");
 
         scanResourceButton.setOnAction(event -> {
@@ -249,7 +249,7 @@ public class FuzzerJava extends Application {
 
         // Кнопка для фаззинга SQL инъекций
         Button startSQLInjectionFuzzingButton = new Button("Начать SQL Injection фаззинг");
-        startSQLInjectionFuzzingButton.setMinWidth(220);
+        startSQLInjectionFuzzingButton.setMinWidth(280);
         startSQLInjectionFuzzingButton.getStyleClass().add("button");
 
         // Устанавливаем обработчик событий для кнопки фаззинга SQL инъекций
@@ -266,7 +266,7 @@ public class FuzzerJava extends Application {
 
         // Кнопка для Directory Traversal фаззинга
         Button startDirectoryTraversalFuzzingButton = new Button("Начать Directory Traversal фаззинг");
-        startDirectoryTraversalFuzzingButton.setMinWidth(220);
+        startDirectoryTraversalFuzzingButton.setMinWidth(280);
         startDirectoryTraversalFuzzingButton.getStyleClass().add("button");
 
         // Устанавливаем обработчик событий для кнопки фаззинга Directory Traversal
@@ -314,7 +314,7 @@ public class FuzzerJava extends Application {
         responseTextArea.getStyleClass().add("response-text-area");
 
         Button closeButton = new Button("Закрыть");
-        closeButton.setMinWidth(100);
+        closeButton.setMinWidth(200);
         closeButton.getStyleClass().add("button");
 
         closeButton.setOnAction(event -> responseStage.close());
@@ -351,7 +351,7 @@ public class FuzzerJava extends Application {
         progressTextArea.getStyleClass().add("response-text-area");
 
         Button closeButton = new Button("Закрыть");
-        closeButton.setMinWidth(100);
+        closeButton.setMinWidth(200);
         closeButton.getStyleClass().add("button");
 
         closeButton.setOnAction(event -> bruteforceStage.close());

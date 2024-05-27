@@ -2,7 +2,8 @@ package org.example;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.*;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.HTTP;
 
@@ -18,6 +19,44 @@ public class HeaderFuzzer {
     public static String sendGetWithHeaders(String url, Map<String, String> headers) throws IOException {
         HttpClient client = HttpClientBuilder.create().build();
         HttpGet request = new HttpGet(url);
+
+        request.addHeader("User-Agent", USER_AGENT);
+        headers.forEach(request::addHeader);
+
+        HttpResponse response = client.execute(request);
+        return handleResponse(response, headers);
+    }
+
+    // Метод для отправки POST-запроса с заголовками
+    public static String sendPostWithHeaders(String url, Map<String, String> headers, String body) throws IOException {
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpPost request = new HttpPost(url);
+
+        request.addHeader("User-Agent", USER_AGENT);
+        headers.forEach(request::addHeader);
+        request.setEntity(new StringEntity(body));
+
+        HttpResponse response = client.execute(request);
+        return handleResponse(response, headers);
+    }
+
+    // Метод для отправки PUT-запроса с заголовками
+    public static String sendPutWithHeaders(String url, Map<String, String> headers, String body) throws IOException {
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpPut request = new HttpPut(url);
+
+        request.addHeader("User-Agent", USER_AGENT);
+        headers.forEach(request::addHeader);
+        request.setEntity(new StringEntity(body));
+
+        HttpResponse response = client.execute(request);
+        return handleResponse(response, headers);
+    }
+
+    // Метод для отправки DELETE-запроса с заголовками
+    public static String sendDeleteWithHeaders(String url, Map<String, String> headers) throws IOException {
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpDelete request = new HttpDelete(url);
 
         request.addHeader("User-Agent", USER_AGENT);
         headers.forEach(request::addHeader);
@@ -49,8 +88,12 @@ public class HeaderFuzzer {
     public static void main(String[] args) {
         String url = "http://example.com";
         Map<String, String> headers = generateHeaders();
+        String body = "{\"name\":\"test\"}";
         try {
             System.out.println("GET с заголовками: " + sendGetWithHeaders(url, headers));
+            System.out.println("POST с заголовками: " + sendPostWithHeaders(url, headers, body));
+            System.out.println("PUT с заголовками: " + sendPutWithHeaders(url, headers, body));
+            System.out.println("DELETE с заголовками: " + sendDeleteWithHeaders(url, headers));
         } catch (IOException e) {
             e.printStackTrace();
         }
