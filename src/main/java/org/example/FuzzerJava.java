@@ -14,6 +14,7 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -65,7 +66,7 @@ public class FuzzerJava extends Application {
             }
         });
 
-        Button scanResourceButton = new Button("Сканировать ресурс");
+        Button scanResourceButton = new Button("Отчет по сканированию");
         scanResourceButton.setMinWidth(280);
         scanResourceButton.getStyleClass().add("button");
 
@@ -333,7 +334,16 @@ public class FuzzerJava extends Application {
     }
 
     private void displayAllResponses(String responses) {
-        displayResponse(responses);
+        // Сохраняем результаты в файл
+        try {
+            File file = new File("Results.txt");
+            FileWriter writer = new FileWriter(file);
+            writer.write(responses);
+            writer.close();
+            displayResponse("Результаты сохранены в файл Results.txt");
+        } catch (IOException e) {
+            displayError("Ошибка при сохранении результатов: " + e.getMessage());
+        }
     }
 
     private void openDirectoryBruteforceWindow(String url, List<String> directories) {
