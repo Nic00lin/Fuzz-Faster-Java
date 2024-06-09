@@ -43,6 +43,10 @@ public class DirectoryBruteforcer {
                 "/profile",
                 "/profiles",
                 "/secure",
+                "about/",
+                "/about",
+                "/about/",
+                "/products/",
                 "/auth",
                 "/authentication",
                 "/authorize",
@@ -148,10 +152,10 @@ public class DirectoryBruteforcer {
     public static String checkDirectory(String url, String directory) throws IOException {
         String fullUrl = url + directory;
         String statusCode = Fuzzer.sendRequest(fullUrl);
-        if (statusCode.equals("200")) {
+        if (statusCode.equals("HTTP Status Code: 200 OK")) {
             return fullUrl;
         }
-        return "";
+        return "" ;
     }
 
     // Метод для многопоточной проверки директорий
