@@ -65,7 +65,7 @@ public class FuzzerJava extends Application {
             }
         });
 
-        Button scanResourceButton = new Button("Сканировать ресурс");
+        Button scanResourceButton = new Button("Отчет по сканированию");
         scanResourceButton.setMinWidth(280);
         scanResourceButton.getStyleClass().add("button");
 
@@ -82,7 +82,7 @@ public class FuzzerJava extends Application {
                 protected Void call() throws Exception {
                     try {
                         String result = ResourceScanner.scanResource(url);
-                        Platform.runLater(() -> displayAllResponses(result));
+                        Platform.runLater(() -> displayResponse(result));
                     } catch (IOException e) {
                         Platform.runLater(() -> displayError("Ошибка при сканировании ресурса: " + e.getMessage()));
                     }

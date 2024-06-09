@@ -1,6 +1,8 @@
 package org.example;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -35,6 +37,12 @@ public class ResourceScanner {
         }
         in.close();
 
-        return result.toString();
+        // Запись в файл
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("output.txt"))) {
+            writer.write(result.toString());
+        }
+
+        // Возвращаем сообщение о сохранении в файл
+        return "Отчет сохранен в файл output.txt\n\n" + result.toString();
     }
 }
